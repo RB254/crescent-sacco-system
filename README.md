@@ -1,49 +1,56 @@
 # Crescent Takaful SACCO Member Management System
 
-A full-stack web application designed for Crescent Takaful SACCO to manage member profiles, handle savings deposits and withdrawals with strict overdraft safeguards, enforce 3x savings loan qualification rules, and dynamically generate accurate annualized flat-interest repayment schedules.
+A full-stack financial platform designed for Crescent Takaful SACCO to manage member onboarding, atomic savings operations, 3x savings loan qualification rules, and flat-interest repayment schedules.
 
 ---
 
-##  System Features & Business Logic Rules
+## Key System Features & Business Logic Rules
 
-### 1. Member Profile & Account Lifecycle
-* Full CRUD management for SACCO members.
-* Automatic assignment of dedicated savings accounts upon member creation.
-
-### 2. Savings Ledger & Overdraft Safeguard
-* Atomic processing for deposits and withdrawals.
-* Strict validation preventing non-positive transaction amounts ($\le 0$).
-* Balance integrity checks ensuring savings accounts cannot be overdrawn ($\text{Balance} \ge 0$).
-
-### 3. 3x Savings Loan Qualification Cap
-* Dynamic server-side validation capping requested loan principals at 300% of a member's total savings balance:
-  $$\text{Maximum Eligible Loan} = 3 \times \text{Current Savings Balance}$$
-
-### 4. Annualized Flat Interest Loan Engine
-* Correct flat interest calculation using the term-fraction annualized formula:
-  $$\text{Total Interest} = \text{Principal} \times 0.10 \times \left(\frac{\text{Term}}{12}\right)$$
-  $$\text{Total Repayable} = \text{Principal} + \text{Total Interest}$$
-  $$\text{Monthly Payment} = \frac{\text{Total Repayable}}{\text{Term}}$$
-* *Example (Principal: KES 3,600,000 | Term: 10 Months):*
-  * **Total Interest:** KES 300,000
-  * **Total Repayable:** KES 3,900,000
-  * **Monthly Installment:** KES 390,000
-  * **Final Month (#10) Remaining Balance:** Exactly KES 0.
+* **Member Account Lifecycle:** Full CRUD management for SACCO members with automatic assignment of dedicated savings accounts upon onboarding.
+* **Savings Ledger & Overdraft Safeguard:** Atomic processing for deposits and withdrawals with strict validation preventing non-positive amounts (less than or equal to 0) and balance integrity checks preventing account overdrafts (Balance >= 0).
+* **3x Savings Loan Qualification Cap:** Server-side validation capping requested loan principals at 300% of a member's total active savings balance:
+  * Max Eligible Loan = 3 * Current Savings Balance
+* **Annualized Flat Interest Loan Engine:** Standardized flat interest calculation using the term-fraction annualized formula:
+  * Total Interest = Principal * 0.10 * (Term / 12)
+  * Total Repayable = Principal + Total Interest
+  * Monthly Payment = Total Repayable / Term
+  * *Example (Principal: KES 3,600,000 | Term: 10 Months):*
+    * **Total Interest:** KES 300,000
+    * **Total Repayable:** KES 3,900,000
+    * **Monthly Installment:** KES 390,000
+    * **Final Month (#10) Remaining Balance:** KES 0
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
-* **Frontend:** React, Tailwind CSS, Lucide React
-* **Backend:** Node.js, Express.js
+* **Frontend:** React, Vite, Tailwind CSS, Axios, Lucide React
+* **Backend:** Node.js, Express.js (Controller-Route Architecture)
 * **Database:** MongoDB Atlas with Mongoose ODM
-* **Testing:** Jest / Supertest
+* **Security & Middleware:** Helmet, CORS, Express Rate Limit
+* **Testing:** Jest, Supertest
 
 ---
 
-##  Local Setup Instructions
+## Project Structure
+
+* **backend/**
+  * **controllers/** - Extracted controller business handlers
+  * **models/** - Mongoose schemas (Member, Loan, SavingsAccount, Transaction)
+  * **routes/** - Express API route declarations
+  * **tests/** - Automated integration test suites
+  * **.env.example** - Template for environment variables
+  * **server.js** - Main Express application entry point
+* **frontend/** - React single-page application (Vite + Tailwind)
+* **render.yaml** - Deployment configuration for Render
+* **ARCHITECTURE.md** - Financial logic & technical specs
+
+---
+
+## Local Setup Instructions
 
 ### 1. Clone & Install Dependencies
+
 ```bash
 git clone [https://github.com/RB254/crescent-sacco-system.git](https://github.com/RB254/crescent-sacco-system.git)
 cd crescent-sacco-system
