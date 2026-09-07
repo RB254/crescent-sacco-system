@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 // Import Routes
 const memberRoutes = require('./routes/memberRoutes');
@@ -14,8 +15,12 @@ const ledgerRoutes = require('./routes/ledgerRoutes');
 
 const app = express();
 
-// 1. Security Headers Middleware
-app.use(helmet());
+// 1. Security Headers Middleware (Configured to allow React scripts & styles)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 // 2. Rate Limiting Middleware (100 requests per 15 minutes per IP)
 const limiter = rateLimit({
@@ -27,29 +32,11 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// 3. Global Middleware & CORS Configuration for Render Deployment
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5173',
-  process.env.FRONTEND_URL,
-].filter(Boolean);
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
-        callback(null, true);
-      } else {
-        callback(new Error('CORS Policy: Request origin blocked.'));
-      }
-    },
-    credentials: true,
-  })
-);
-
+// 3. Global Middleware & CORS Configuration
+app.use(cors());
 app.use(express.json());
 
-// 4. Mount Routes
+// 4. Mount API Routes
 app.use('/api/members', memberRoutes);
 app.use('/api/savings', savingsRoutes);
 app.use('/api/loans', loanRoutes);
@@ -61,7 +48,18 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Crescent SACCO API is active' });
 });
 
-// 5. Global Centralized Error Handler Middleware
+// 5. Serve React Frontend Static Files & SPA Routing
+const frontendBuildPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendBuildPath));
+
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(frontendBuildPath, 'index.html'));
+});
+
+// 6. Global Centralized Error Handler Middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled Server Error:', err.stack);
   res.status(err.status || 500).json({
@@ -72,34 +70,36 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Database Connection & Server Initialization
+// Database Connection & Non-blocking Server Initialization
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  console.error('❌ MONGODB_URI is missing from .env file');
-  process.exit(1);
+// Bind server port first to pass Render port checks
+let server;
+if (process.env.NODE_ENV !== 'test') {
+  server = app.listen(PORT, () => {
+    console.log(`🚀 Single-URL Server listening on port ${PORT}`);
+  });
 }
 
-mongoose
-  .connect(MONGODB_URI)
-  .then(async () => {
-    console.log('✅ Connected to MongoDB database successfully');
-
-    try {
-      await mongoose.connection.collection('savingsaccounts').dropIndex('accountNumber_1');
-      console.log('⚡ Successfully dropped accountNumber_1 index');
-    } catch (err) {
-      console.log('ℹ️ Index check complete: accountNumber_1 index was already removed or does not exist.');
-    }
-
-    // Only start server listener if NOT running inside automated test runner
-    if (process.env.NODE_ENV !== 'test') {
-      app.listen(PORT, () => {
-        console.log(`🚀 Server listening on port ${PORT}`);
-      });
-    }
-  })
-  .catch((err) => console.error('❌ Database connection error:', err));
+// Asynchronous MongoDB Connection
+if (MONGODB_URI) {
+  mongoose
+    .connect(MONGODB_URI)
+    .then(async () => {
+      console.log('✅ Connected to MongoDB database successfully');
+      try {
+        await mongoose.connection.collection('savingsaccounts').dropIndex('accountNumber_1');
+        console.log('⚡ Successfully dropped accountNumber_1 index');
+      } catch (err) {
+        console.log('ℹ️ Index check complete: accountNumber_1 index was already removed or does not exist.');
+      }
+    })
+    .catch((err) => {
+      console.error('❌ Database connection error:', err.message);
+    });
+} else {
+  console.error('⚠️ Warning: MONGODB_URI missing from environment variables.');
+}
 
 module.exports = app;
