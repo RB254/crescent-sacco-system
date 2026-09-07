@@ -17,25 +17,25 @@ export default function Header() {
   return (
     <header className="w-full">
       {/* Purple-to-Orange Banner */}
-      <div className="bg-gradient-to-r from-purple-900 via-purple-700 to-amber-600 text-white px-8 py-6 shadow-md">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-white p-1 flex items-center justify-center border border-white/30 shadow-sm overflow-hidden">
+      <div className="bg-gradient-to-r from-purple-900 via-purple-700 to-amber-600 text-white px-4 sm:px-6 lg:px-8 py-4 sm:py-6 shadow-md">
+        <div className="max-w-7xl mx-auto flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full bg-white p-1 flex items-center justify-center border border-white/30 shadow-sm overflow-hidden">
             <img src={logo} alt="Crescent Takaful SACCO Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight leading-snug">
               Crescent Takaful SACCO – Member Management System
             </h1>
-            <p className="text-sm text-purple-100/90 font-light">
+            <p className="text-xs sm:text-sm text-purple-100/90 font-light">
               Savings accounts, ledger transactions & flat-rate loan scheduling
             </p>
           </div>
         </div>
       </div>
 
-      {/* Navigation Bar */}
-      <div className="bg-slate-200/60 border-b border-slate-300 px-8 py-2">
-        <div className="max-w-7xl mx-auto flex gap-2">
+      {/* Navigation Bar - Touch-scrollable on mobile */}
+      <div className="bg-slate-200/60 border-b border-slate-300 px-4 sm:px-6 lg:px-8 py-2">
+        <div className="max-w-7xl mx-auto flex gap-2 overflow-x-auto no-scrollbar py-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -43,13 +43,13 @@ export default function Header() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
                   isActive
                     ? 'bg-white text-slate-900 shadow-sm font-semibold'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 shrink-0" />
                 {item.label}
               </Link>
             );

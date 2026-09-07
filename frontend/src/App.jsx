@@ -10,9 +10,9 @@ import Docs from './components/Docs';
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-slate-100 font-sans text-slate-800 flex flex-col">
+      <div className="min-h-screen bg-slate-100 font-sans text-slate-800 flex flex-col overflow-x-hidden">
         <Header />
-        <main className="flex-1 max-w-7xl w-full mx-auto p-8">
+        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
