@@ -48,11 +48,11 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Crescent SACCO API is active' });
 });
 
-// 5. Serve React Frontend Static Files & SPA Routing
+// 5. Serve React Frontend Static Files & SPA Routing (Express v5 wildcard compatible)
 const frontendBuildPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendBuildPath));
 
-app.get('*', (req, res, next) => {
+app.get('/(.*)', (req, res, next) => {
   if (req.path.startsWith('/api')) {
     return next();
   }
