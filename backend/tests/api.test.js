@@ -5,7 +5,8 @@ const express = require('express');
 // Mock Mongoose Models
 jest.mock('../models/SavingsAccount', () => ({
   find: jest.fn().mockResolvedValue([{ balance: 1000 }, { balance: 2000 }]),
-  findOne: jest.fn().mockResolvedValue(null),
+  // Updated mock: Return a KES 2,000,000 balance so 3x limit is KES 6,000,000 (covers 3,600,000 principal)
+  findOne: jest.fn().mockResolvedValue({ balance: 2000000 }),
   updateOne: jest.fn().mockResolvedValue({ acknowledged: true }),
   save: jest.fn().mockResolvedValue({})
 }));

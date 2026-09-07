@@ -10,18 +10,14 @@ exports.getDashboardStats = async (req, res) => {
       { $group: { _id: null, total: { $sum: '$balance' } } }
     ]);
 
-    let activeLoans = 0;
-    let loanBook = 0;
+    const activeLoans = await Loan.countDocuments({ status: 'APPROVED' });
 
-    if (Loan && typeof Loan.countDocuments === 'function') {
-      activeLoans = await Loan.countDocuments({ status: 'APPROVED' });
+    const totalLoansData = await Loan.aggregate([
+      { $match: { status: 'APPROVED' } },
+      { $group: { _id: null, total: { $sum: '$principal' } } }
+    ]);
 
-      const totalLoansData = await Loan.aggregate([
-        { $match: { status: 'APPROVED' } },
-        { $group: { _id: null, total: { $sum: '$principal' } } }
-      ]);
-      loanBook = totalLoansData.length > 0 ? totalLoansData[0].total : 0;
-    }
+    const loanBook = totalLoansData.length > 0 ? totalLoansData[0].total : 0;
 
     res.status(200).json({
       memberCount,

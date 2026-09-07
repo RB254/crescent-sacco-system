@@ -29,7 +29,6 @@ export default function Savings() {
       const memberList = Array.isArray(res.data) ? res.data : [];
       setMembers(memberList);
       if (memberList.length > 0) {
-        // Ensure we extract the exact ID property from Mongo
         const firstId = memberList[0]._id || memberList[0].id;
         setSelectedMember(firstId);
       }
@@ -49,7 +48,7 @@ export default function Savings() {
 
   const fetchMemberTransactions = async (memberId) => {
     try {
-      const res = await API.get(`/ledger/member/${memberId}`);
+      const res = await API.get(`/savings/transactions/${memberId}`);
       setTransactions(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       setTransactions([]);
@@ -76,7 +75,6 @@ export default function Savings() {
     try {
       setLoading(true);
       
-      // POST request with verified payload
       await API.post('/savings/transaction', {
         memberId: selectedMember,
         type,
@@ -87,7 +85,6 @@ export default function Savings() {
       fetchMemberSavings(selectedMember);
       fetchMemberTransactions(selectedMember);
     } catch (err) {
-      // Show exact server error message if available
       setError(err.response?.data?.message || 'Failed to post transaction.');
     } finally {
       setLoading(false);
