@@ -48,7 +48,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Crescent SACCO API is active' });
 });
 
-// 5. Serve React Frontend Static Files & SPA Middleware (Bypasses path-to-regexp completely)
+// 5. Serve React Frontend Static Files & SPA Middleware
 const frontendBuildPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendBuildPath));
 
@@ -70,11 +70,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Database Connection & Non-blocking Server Initialization
+// Database Connection & Server Initialization
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// Bind server port first to pass Render port checks
 let server;
 if (process.env.NODE_ENV !== 'test') {
   server = app.listen(PORT, () => {
