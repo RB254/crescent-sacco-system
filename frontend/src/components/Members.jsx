@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 
 const Members = () => {
   const [members, setMembers] = useState([]);
@@ -16,7 +16,7 @@ const Members = () => {
   // Fetch all members on mount
   const fetchMembers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/members');
+      const response = await API.get('/members');
       setMembers(Array.isArray(response.data) ? response.data : []);
       setErrorMsg('');
     } catch (err) {
@@ -39,7 +39,7 @@ const Members = () => {
     setLoading(true);
 
     try {
-      await axios.post('http://localhost:5000/api/members', formData);
+      await API.post('/members', formData);
       setFormData({
         fullName: '',
         nationalId: '',
