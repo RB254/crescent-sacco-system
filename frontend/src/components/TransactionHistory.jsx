@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+// Relative path fallback allows fetch to automatically use the current origin
+const API_BASE_URL = '';
 
 const TransactionHistory = ({ memberId }) => {
   const [transactions, setTransactions] = useState([]);
